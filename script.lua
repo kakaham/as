@@ -1,4 +1,4 @@
-ocal player = game:GetService("Players").LocalPlayer
+local player = game:GetService("Players").LocalPlayer
 local TweenService = game:GetService("TweenService")
 
 local gui = Instance.new("ScreenGui")
