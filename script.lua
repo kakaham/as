@@ -127,6 +127,6 @@ tween:Play()
 
 
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/DROID-cell-sys/ANTI-UTTP-SCRIPTT/refs/heads/main/EGOR%20SCRIPT%20BY%20ANTI-UTTP"))()
+loadstring(game:HttpGet('https://pastebin.com/raw/3Rnd9rHf'))()
 
 
