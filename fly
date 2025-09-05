@@ -1,0 +1,173 @@
+-- 🔥 Fly Script with GUI (E toggle, respawn reset) 🔥
+
+local savedSpeed = 50
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Функция создания GUI + логики
+local function setupFly()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid")
+	local HRP = character:WaitForChild("HumanoidRootPart")
+
+	local baseSpeed = savedSpeed
+	local flySpeed = baseSpeed
+	local flying = false
+	local active = true
+	local inputFlags = { forward = false, back = false, left = false, right = false, up = false, down = false }
+
+	local bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+
+	local bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+
+	-- GUI
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "FlyControlGui"
+	screenGui.ResetOnSpawn = false
+	screenGui.Parent = player:WaitForChild("PlayerGui")
+
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0, 300, 0, 60)
+	mainFrame.Position = UDim2.new(1, -310, 0, 10)
+	mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	mainFrame.BackgroundTransparency = 0.3
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Parent = screenGui
+
+	local statusLabel = Instance.new("TextLabel")
+	statusLabel.Text = "Fly: OFF"
+	statusLabel.Size = UDim2.new(0, 120, 0, 50)
+	statusLabel.Position = UDim2.new(0, 5, 0, 5)
+	statusLabel.BackgroundTransparency = 1
+	statusLabel.TextColor3 = Color3.fromRGB(200, 0, 0)
+	statusLabel.Font = Enum.Font.GothamBold
+	statusLabel.TextScaled = true
+	statusLabel.Parent = mainFrame
+
+	local speedBox = Instance.new("TextBox")
+	speedBox.Name = "SpeedBox"
+	speedBox.Text = tostring(baseSpeed)
+	speedBox.Size = UDim2.new(0, 100, 0, 50)
+	speedBox.Position = UDim2.new(0, 130, 0, 5)
+	speedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	speedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+	speedBox.Font = Enum.Font.GothamBold
+	speedBox.TextScaled = true
+	speedBox.ClearTextOnFocus = false
+	speedBox.Parent = mainFrame
+
+	local closeButton = Instance.new("TextButton")
+	closeButton.Text = "X"
+	closeButton.Size = UDim2.new(0, 40, 0, 40)
+	closeButton.Position = UDim2.new(1, -45, 0, 10)
+	closeButton.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
+	closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.TextScaled = true
+	closeButton.Parent = mainFrame
+
+	-- управление флаем
+	local function startFlying()
+		flying = true
+		flySpeed = baseSpeed
+		bodyVelocity.Parent = HRP
+		bodyGyro.Parent = HRP
+		humanoid.PlatformStand = true
+		statusLabel.Text = "Fly: ON"
+		statusLabel.TextColor3 = Color3.fromRGB(0, 200, 0)
+	end
+
+	local function stopFlying()
+		flying = false
+		bodyVelocity.Parent = nil
+		bodyGyro.Parent = nil
+		humanoid.PlatformStand = false
+		statusLabel.Text = "Fly: OFF"
+		statusLabel.TextColor3 = Color3.fromRGB(200, 0, 0)
+	end
+
+	speedBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed then
+			local newSpeed = tonumber(speedBox.Text)
+			if newSpeed and newSpeed > 0 then
+				baseSpeed = newSpeed
+				savedSpeed = newSpeed
+				if flying then flySpeed = baseSpeed end
+			else
+				speedBox.Text = tostring(baseSpeed)
+			end
+		end
+	end)
+
+	closeButton.MouseButton1Click:Connect(function()
+		active = false
+		screenGui:Destroy()
+		stopFlying()
+	end)
+
+	-- управление кнопками
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not active or gameProcessed then return end
+
+		if input.KeyCode == Enum.KeyCode.W then inputFlags.forward = true end
+		if input.KeyCode == Enum.KeyCode.S then inputFlags.back = true end
+		if input.KeyCode == Enum.KeyCode.A then inputFlags.left = true end
+		if input.KeyCode == Enum.KeyCode.D then inputFlags.right = true end
+		if input.KeyCode == Enum.KeyCode.Q then inputFlags.down = true end
+
+		if input.KeyCode == Enum.KeyCode.E then
+			if flying then stopFlying() else startFlying() end
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if not active then return end
+		if input.KeyCode == Enum.KeyCode.W then inputFlags.forward = false end
+		if input.KeyCode == Enum.KeyCode.S then inputFlags.back = false end
+		if input.KeyCode == Enum.KeyCode.A then inputFlags.left = false end
+		if input.KeyCode == Enum.KeyCode.D then inputFlags.right = false end
+		if input.KeyCode == Enum.KeyCode.Q then inputFlags.down = false end
+	end)
+
+	-- апдейт
+	RunService.RenderStepped:Connect(function()
+		if not active or not flying then return end
+
+		local dir = Vector3.zero
+		local camCF = Camera.CFrame
+
+		if inputFlags.forward then dir += camCF.LookVector end
+		if inputFlags.back then dir -= camCF.LookVector end
+		if inputFlags.left then dir -= camCF.RightVector end
+		if inputFlags.right then dir += camCF.RightVector end
+		if inputFlags.up then dir += Vector3.yAxis end
+		if inputFlags.down then dir -= Vector3.yAxis end
+
+		if dir.Magnitude > 0 then dir = dir.Unit end
+
+		bodyVelocity.Velocity = dir * flySpeed
+		bodyGyro.CFrame = camCF
+	end)
+
+	-- если игрок умирает → GUI убирается
+	humanoid.Died:Connect(function()
+		active = false
+		if screenGui then screenGui:Destroy() end
+		stopFlying()
+	end)
+end
+
+-- запускаем при старте и каждом респавне
+player.CharacterAdded:Connect(function()
+	task.wait(1) -- ждём пока тело загрузится
+	setupFly()
+end)
+
+if player.Character then
+	setupFly()
+end
