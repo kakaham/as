@@ -1,0 +1,215 @@
+--[[
+🔥 Eligant Hub - Exploit-Style GUI 🔥
+Все окна в одном скрипте, сразу появляется
+]]--
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "EligantHub"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0,500,0,300)
+mainFrame.Position = UDim2.new(0.5,-250,0.5,-150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Text = "Eligant Hub"
+title.Size = UDim2.new(1, -40,0,40)
+title.Position = UDim2.new(0,10,0,0)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.BackgroundTransparency = 1
+title.Parent = mainFrame
+
+-- Minimize Button
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0,30,0,30)
+minimizeBtn.Position = UDim2.new(1,-60,0,5)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+minimizeBtn.Text = "-"
+minimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+minimizeBtn.Parent = mainFrame
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0,30,0,30)
+closeBtn.Position = UDim2.new(1,-30,0,5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.Parent = mainFrame
+
+-- Mini Button after minimize
+local miniButton = Instance.new("TextButton")
+miniButton.Size = UDim2.new(0,40,0,40)
+miniButton.Position = UDim2.new(0.5,-20,0.1,0)
+miniButton.BackgroundColor3 = Color3.fromRGB(60,60,60)
+miniButton.Text = "-"
+miniButton.Visible = false
+miniButton.Active = true
+miniButton.Draggable = true
+miniButton.TextColor3 = Color3.fromRGB(255,255,255)
+miniButton.Parent = screenGui
+
+-- Left Menu
+local leftMenu = Instance.new("Frame")
+leftMenu.Size = UDim2.new(0,150,1,-50)
+leftMenu.Position = UDim2.new(0,0,0,50)
+leftMenu.BackgroundColor3 = Color3.fromRGB(40,40,40)
+leftMenu.Parent = mainFrame
+
+-- Right Content
+local rightContent = Instance.new("Frame")
+rightContent.Size = UDim2.new(1,-160,1,-50)
+rightContent.Position = UDim2.new(0,160,0,50)
+rightContent.BackgroundColor3 = Color3.fromRGB(25,25,25)
+rightContent.Parent = mainFrame
+
+local categories = {"Main Scripts","FE Scripts","Neko Script","Credits"}
+local buttons = {}
+
+for i,name in ipairs(categories) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,-10,0,40)
+    btn.Position = UDim2.new(0,5,0,(i-1)*45)
+    btn.Text = name
+    btn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.Parent = leftMenu
+    buttons[name] = btn
+end
+
+-- Clear Right Content
+local function clearContent()
+    for _,c in pairs(rightContent:GetChildren()) do
+        if c:IsA("GuiObject") then c:Destroy() end
+    end
+end
+
+-- Main Scripts
+buttons["Main Scripts"].MouseButton1Click:Connect(function()
+    clearContent()
+    -- Fly Button
+    local flyBtn = Instance.new("TextButton")
+    flyBtn.Size = UDim2.new(0,200,0,50)
+    flyBtn.Position = UDim2.new(0,20,0,20)
+    flyBtn.Text = "Fly"
+    flyBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+    flyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    flyBtn.Font = Enum.Font.GothamBold
+    flyBtn.TextScaled = true
+    flyBtn.Parent = rightContent
+
+    local flySub = Instance.new("TextLabel")
+    flySub.Text = "Press E to fly"
+    flySub.Size = UDim2.new(1,0,0,20)
+    flySub.Position = UDim2.new(0,0,1,0)
+    flySub.TextColor3 = Color3.fromRGB(180,180,180)
+    flySub.BackgroundTransparency = 1
+    flySub.Font = Enum.Font.Gotham
+    flySub.TextScaled = true
+    flySub.Parent = flyBtn
+
+    flyBtn.MouseButton1Click:Connect(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/kakaham/as/e3f0be4f3f4ba8e03027b5687d6a3eb5e92f3c4d/fly"))()
+    end)
+
+    -- Invisible Button
+    local invisBtn = Instance.new("TextButton")
+    invisBtn.Size = UDim2.new(0,200,0,50)
+    invisBtn.Position = UDim2.new(0,20,0,80)
+    invisBtn.Text = "Invisible"
+    invisBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+    invisBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    invisBtn.Font = Enum.Font.GothamBold
+    invisBtn.TextScaled = true
+    invisBtn.Parent = rightContent
+
+    invisBtn.MouseButton1Click:Connect(function()
+        setclipboard("Invisible script copied!") -- пример, можно вставить реальную ссылку
+    end)
+end)
+
+-- Other categories
+for _,name in ipairs({"FE Scripts","Neko Script"}) do
+    buttons[name].MouseButton1Click:Connect(function()
+        clearContent()
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(1,0,1,0)
+        lbl.Text = "Coming soon..."
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextScaled = true
+        lbl.TextColor3 = Color3.fromRGB(255,255,255)
+        lbl.BackgroundTransparency = 1
+        lbl.Parent = rightContent
+    end)
+end
+
+-- Credits
+buttons["Credits"].MouseButton1Click:Connect(function()
+    clearContent()
+    local lbl = Instance.new("TextLabel")
+    lbl.Text = "Created by: Eligant"
+    lbl.Size = UDim2.new(1,0,0,50)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = Color3.fromRGB(255,255,255)
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextScaled = true
+    lbl.Parent = rightContent
+
+    -- Youtube Button
+    local ytBtn = Instance.new("TextButton")
+    ytBtn.Text = "Youtube"
+    ytBtn.Size = UDim2.new(0,150,0,40)
+    ytBtn.Position = UDim2.new(0,20,0,60)
+    ytBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    ytBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    ytBtn.Font = Enum.Font.GothamBold
+    ytBtn.TextScaled = true
+    ytBtn.Parent = rightContent
+    ytBtn.MouseButton1Click:Connect(function()
+        setclipboard("https://www.youtube.com/@MixalamsLams")
+    end)
+
+    -- Discord Button
+    local dcBtn = Instance.new("TextButton")
+    dcBtn.Text = "Discord"
+    dcBtn.Size = UDim2.new(0,150,0,40)
+    dcBtn.Position = UDim2.new(0,200,0,60)
+    dcBtn.BackgroundColor3 = Color3.fromRGB(0,0,200)
+    dcBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    dcBtn.Font = Enum.Font.GothamBold
+    dcBtn.TextScaled = true
+    dcBtn.Parent = rightContent
+    dcBtn.MouseButton1Click:Connect(function()
+        setclipboard("https://discord.com/channels/@me/1288262049151057941")
+    end)
+end)
+
+-- Close logic
+closeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    miniButton.Visible = true
+end)
+miniButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    miniButton.Visible = false
+end)
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    miniButton.Visible = true
+end)
